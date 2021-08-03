@@ -1,0 +1,278 @@
+//---------------------------------------------------------------------------
+// Camargo-Schubert Engenheiros Associados
+//
+// AUSTER - Suite de análise de dados anemométricos.
+//
+// CDV_certificacao
+//
+// Script para cálculos de certificação de dados anemométricos.
+// Utilize-o como roteiro depois de terminadas as atividades de
+// preparação dos dados certificáveis (por exemplo com o script
+// CDV_preparacao.sce )
+//
+// Gustavo Violato, Fábio Catani, Frederico Estante
+// 2011-2015
+//---------------------------------------------------------------------------
+// Instruções
+//
+// - Preencher todos os campos marcados com a tag <--???-->
+// - Tirando a área de globais gerais, alterar todas as variáveis
+//   que se iniciam por CDV_ para moldar o script às suas necessidades
+//
+//---------------------------------------------------------------------------
+clc
+
+// Reseta o espaço de trabalho e recarrega as variáveis da torre
+CDV_RESET   = 1;
+
+//---------------------------------------------------------------------------
+// Limpeza do espaço de trabalho. Carregamento das bibliotecas.
+if (CDV_RESET)
+  clear
+  AUS_HOME = getenv("AUSTER_PATH");
+  exec(AUS_HOME+"/src/scilab/austerlibs.sci");
+  exec loggers.sce;
+  exec(AUS_HOME+"\src\scilab\scripts\veter_certificacao_excel.sce");
+  CDV_RESET   = 1;
+end
+
+LINHAS = lines();
+lines(0);
+
+// Globais gerais (não alterar!)
+CDV_LP_PROX = -1; // Opção pelo ponto mais próximo quando do cálculo de
+                  // longo prazo
+CDV_LP_CORR = -2; // Opção pelo ponto de maior correlação quando do
+                  // cálculo de longo prazo
+
+//---------------------------------------------------------------------------
+// Configurações de verbosidade
+CDV_VERBOSO = 1; // Verboso deste script
+VERBOSO     = 0; // Verboso interno (definido em comum.sci e dividido
+                 // pelas funções de cálculo)
+//---------------------------------------------------------------------------
+// Configurações de cálculo e impressão de dados
+// 1-> FAZ, 0-> NÂO FAZ
+
+CDV_APLICA_FILTRO  = 0; //ATENÇÃO Aplica filtros de mínimo e máximo na variável total para remover valores espúrios,
+                       //VER CHAMADA DA FUNÇÃO filtra_series e variável global com os parâmetros (Filtros)
+
+CDV_CALC_ALFAIT  = 1; // Calcula dispersão de alfa e IT por direção
+CDV_CALC_INCERT  = 1; // Calcula incertezas de medição e IT média
+CDV_CALC_ROSA    = 1; // Calcula as rosas (freqüência e média) com o
+                      // total de dados
+CDV_CALC_SUM_AA  = 1; // Calcula resumo das velocidades e parâmetros de
+		      // wbl medidos pelos anemômetros mês a mês, dando o
+		      // total parcial para cada ano de medição
+CDV_CALC_SUM_TOT = 1; // Calcula resumos acima de maneira seqüencial, sem
+		      // separação nem total parcial para cada ano
+CDV_CALC_SUM_EXT = 1; // Calcula resumo das velocidade e parâmetros de wbl
+		      // extrapolados para as alturas desejadas mês a mês,
+		      // dando o total parcial para cada ano de medição
+CDV_CALC_MAM     = 1; // Calcula climatologia mensal das médias,
+		      // parâmetros de wbl, temperatura, pressão e umid.
+CDV_CALC_VALID   = 1; // Calcula a quantidade de dados válidos
+CDV_CALC_LP      = 1; // Realiza o cálculo de longo prazo automaticamente
+CDV_CALC_DIURNO  = 1; // Calcula o regime diurno de velocidade e alfa
+CDV_CALC_HIST    = 1; // Calcula o histograma e os parâmetros de wbl totais
+CDV_CALC_IEC     = 1; // Calcula as distribuições de velocidade e
+		      // turbulência para a classificação IEC da torre
+CDV_CALC_EXTRM   = 1; // Calcula os ventos extremos e intensidades de
+		      // turbulência média e máxima
+CDV_CALC_EXTRM_GUMBEL = 1; // Calcula ventos extremos (Ve50 e Vref50) por Gumbel
+CDV_CALC_CLIMA   = 1; // Calcula os dados climáticos para a torre
+CDV_CLIMAT_TORRE  = 1; // Usar dados climatológicos da torre? 0 - Não, 1 - Sim
+CDV_Z0_AUSTER  = 1; // Usar z0 e alfa calculados pelo Auster? 0 - Não, 1 - Sim
+CDV_IMPRIME_RES  = 1; // Vai imprimindo os resultados conforme calcula
+CDV_IMPRIME_EPE  = 1; // Imprime as séries certificadas no padrão EPE
+IMPRIME_TAB_FREQ  = 1; // Imprime os dados de Frequência para gerar o sumário de certificão (Sumario_CDVs_v2.xlsm) Powered by Isa 2020
+CDV_IMPRIME_OPENWIND = 0; // Imprime as séries no padrão openWind
+CDV_LP_NPNT = 16;  // Número de pontos para realizar a análise
+
+PROCESSAR = 1; // Processar dados brutos
+CONCATENAR = 1; // Concatenar dados brutos
+
+//---------------------------------------------------------------------------
+// Variáveis particulares da certificação, definidas pelo usuário
+stacksize("max");
+// Diretório de certificação
+
+dir_cert = "%%dir_cert%%";      //string SEM BARRA (/) NO FINAL
+
+// Diretório de dados brutos
+dir_brutos = dir_cert + "\temp";      //string SEM BARRA (/) NO FINAL
+
+// Diretório de origem dos dados corrigidos para a certificação (dados_processados)
+diro = dir_cert + "\dados_processados";
+
+// Cria o período total para carregar os dados
+
+
+periodo = criaperiodo(%%periodo_total%%); // Múltiplo de 12 mesmo que não tenha dados no final
+periodo_total.ini.dia = 1;
+periodo_total.fim.dia = CALENDARIO(string(periodo_total.fim.mes)).dias;
+
+// ----------------Para relatório
+// Aba "Geral"
+
+
+cliente = "%%cliente%%";             //string
+
+cod_torre = "%%cod_torre%%";           //string
+
+codigo_relatorio = "%%cod_relatorio%%";
+
+data_relatorio = "%%data_relatorio%%";
+
+// Cria o período de certificação adequado
+
+periodo = criaperiodo(%%periodo_total%%);
+periodo.ini.dia = 1;
+periodo.fim.dia = CALENDARIO(string(periodo.fim.mes)).dias;
+
+
+elaborador_nome = "%%elaborador_nome%%"; // string
+elaborador_formacao = "%%elaborador_formacao%%"; // string
+elaborador_crea = "%%elaborador_crea%%"; // string
+
+//revisor_nome = "Fabiano de Jesus Lima da Silva"; // string
+//revisor_formacao = "Engenheiro Aeronáutico"; // string
+//revisor_crea = "PR-30100/D"; // string
+
+// Base de longo prazo
+base_lp = "ERA5"; //"MERRA", "NCAR", "VORTEX", etc (ver comum.sci);
+texto_lp = " - ECMWF Re-Analysis, 5th Generation"; //"GMAO Modern-Era Retrospective-analysis for Research and Applications"
+pnt_lp  = CDV_LP_PROX;   // Pode-se usar a tag do ponto ou opções CDV_LP_PROX ou CDV_LP_CORR
+periodo_lp = criaperiodo(07,2013,06,2016);
+
+// Fim do período comum de longo_prazo
+lpf.ano = 2021;
+lpf.mes = 03;
+
+// Altura(s) desejada(s) para extrapolação
+alt_des = [105 108 115 120 125.4 126];
+// Altura(s) desejada(s) para extrapolação dos dados climatológicos, das
+// distribuições para classificação IEC e para os sumários do CDV
+alt_sumarios = alt_des;
+anems_extrap_lp = [1 2]; // Anemômetros a utilizar para extrapolar os dados de longo prazo
+anems_extrap = [1 2];
+altura_rotor = 120; // numero
+
+
+// Informações para cálculo de ventos extremos de acordo com
+// a norma NBR6123 (Leia a porra da norma inteira)
+nbr_v_isopleta       = 30;
+nbr_desnivel_terreno = 105;
+nbr_theta_terreno    = 8.5;     // graus
+nbr_z0_medio         = 0.2;
+
+// Valores para histogramas de análise de horas de operação
+Maq.vel = [3 25]; // Valor de cut-in/cut-out da máquina, sugestão: Vel_maq.in = 3m/s Vel_maq.out = 25m/s
+Maq.ang = [-8 8]; // Angulo de in-flow operacional da máquina em graus
+
+// Gerar cabecalho com variaveis da torre com base no projeto (.XML) do VeterC:
+xml_veterc = "";
+cabecalho_do_veterc = dir_cert + '\cabecalho_' + cod_torre + '_VeterC.sce';
+if isfile(xml_veterc) & ~isfile(cabecalho_do_veterc)// Verifica se arquivo existe, para não sobreescrever alterações manuais
+    xmlveterc_para_cabecalho(xml_veterc, cabecalho_do_veterc);
+end
+if isfile(cabecalho_do_veterc)
+    exec(cabecalho_do_veterc);
+end
+
+// Parte automágica  
+
+// Chama o script com os dados da torre
+exec(dir_cert + '\dados_' + cod_torre + ".sce");
+
+// Configura variaveis para o relatorio
+CD.altsit = CD.alts(anems_extrap_lp);
+CD.alfait = [CD.vel(anems_extrap_lp(1)) CD.sdvel(anems_extrap_lp(1)) CD.vel(anems_extrap_lp(2)) CD.sdvel(anems_extrap_lp(2))];
+CD.alfaz0 = anems_extrap_lp;
+torreparque = cod_torre;
+if ~isempty(nome_caracteristico)
+    torreparque = torreparque + " - " + nome_caracteristico;
+end
+[y_utm, x_utm, zona] = latlon2utm(lat_d,lon_d);
+[latitude, longitude] = dec2gms(lat_d,lon_d);
+salva_kml(cod_torre + ".kml",[lat_d lon_d],cod_torre);
+latitude = msprintf("%02dº %02d'' %04.1f""", abs(latitude)');
+longitude = msprintf("%02dº %02d'' %04.1f""", abs(longitude)');
+inicio = msprintf("%02d/%02d/%04d", periodo.ini.dia, periodo.ini.mes, periodo.ini.ano);
+fim = msprintf("%02d/%02d/%04d", periodo.fim.dia, periodo.fim.mes, periodo.fim.ano);
+data_d = passames(lpf, -1 * ANOS_LP * 12 + 1);
+inicio_lp = msprintf("%02d/%02d/%04d", 1, data_d.mes, data_d.ano);
+fim_lp = msprintf("%02d/%02d/%04d", CALENDARIO(string(lpf.mes)).dias, lpf.mes, lpf.ano);
+fim_comum = fim_lp;
+if strtod(msprintf("%04d%02d",lpf.ano, lpf.mes)) > strtod(msprintf("%04d%02d", periodo.fim.ano, periodo.fim.mes))
+    fim_comum = fim;
+end
+alt_total = altitude_torre + altura_rotor;
+afast_haste_centrotorre = msprintf("%.2f", ( (comprimento_bracos + largura_face/2) / largura_face ));
+t = calcula_t(diametro_montantes, diametro_trelica, largura_face, altura_face);
+distorcao = msprintf("%.2f", CalculaDistorcao(largura_face, comprimento_bracos, t));
+x_diametro_suporte = msprintf("%.2f", ( distancia_anemo_haste / diametro_bracos ));
+ids_instrumentos = strtod(strsubst(configuracao(:,1), "instrumentos_",""));
+config = [configuracao(:,2:3) instrumentos(ids_instrumentos, 1) configuracao(:,4:$) instrumentos(ids_instrumentos, 2:3)]
+aux = [instrumentos(ids_instrumentos, [1 4 5 6]) configuracao(:,4:5)];
+aux = aux(find(aux(:,1) == "Anemometro"), :);
+[a,b] = unique(aux, 'r');
+anemos = aux(gsort(b,'r','i'),:)
+
+if PROCESSAR
+    // Decodificar dados brutos
+    processar_brutos(dir_brutos, dir_cert);
+end
+
+// Caso queira recompilar um período específico
+//recompilar(dir_cert, criaperiodo(04,2020,06,2020));
+
+if CONCATENAR
+    // Concatenar e aplicar configurações
+    concatenar_brutos(dir_cert, config, cod_torre);
+end
+
+// Chama o script chama_mensalestats.sce para visualizar, corrigir os dados
+exec(AUS_HOME+'\src\scilab\scripts\interface_web.sce');
+
+exec(AUS_HOME+'\src\scilab\scripts\chama_mensalestats_local.sce');
+pause
+//---------------------------------------------------------------------------
+// Chama o script 'CDV_certificacao_v6_script' para dados locais
+exec(AUS_HOME+'\src\scilab\scripts\CDV_certificacao_v6_script.sce');
+
+// Pegar informações calculadas no script de certificação
+exec(AUS_HOME+'\src\scilab\scripts\CDV_certificacao_v6_info.sce');
+
+//****************************EXCEL*************************************
+// Cria arquivo Excel de certificação
+exec(AUS_HOME+"\src\scilab\scripts\veter_certificacao_excel.sce");
+dt = getdate();
+criar_planilha(dir_cert + "\certificacao" + msprintf("%04d%02d%02d-%02d_%02d_%02d", dt([1:2 6:9])) + ".xlsm");
+pause
+// Exportar as tabelas do Excel criado acima. Apos editar a planilha (se necessario), renomeie a mesma como "certificacao.xlsm"
+exportar_tabelas(dir_cert + "/certificacao.xlsm", dir_cert, N_a_total);
+
+//***************************GRAPHER************************************
+// Gera e exporta as imagens para o relatório do CDV
+roda_grafbox("cdv.xml",[AUS_HOME,dir_cert,string(N_a)])
+pause
+//roda_grafbox("cdv_Surfer.xml",[AUS_HOME,dir_cert])
+exporta_imagens_cdv(dir_cert)
+//exporta_imagens_cdv2(dir_cert)  //Surfer
+
+//****************************WORD**************************************
+// Cria arquivo Word de certificação
+exec(AUS_HOME+"\src\scilab\scripts\veter_certificacao_word.sce");
+nome_arquivo = dir_cert + "/" + strsubst(codigo_relatorio, "/", "-") + "_" + cod_torre;
+criar_relatorio(nome_arquivo + ".docx");
+pause
+salvar_como_pdf(nome_arquivo + ".docx", nome_arquivo + ".pdf");
+
+// Cria arquivo da série certificada no padrão EPE
+
+// Cria arquivo da série bruta no padrão EPE
+
+// Cria .zip de dados brutos no padrão EPE
+
+// Cria XML da certificação

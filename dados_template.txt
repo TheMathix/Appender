@@ -1,0 +1,158 @@
+// Modelo de cabeçalho contendo as informações da torre
+// Pode ser gerado parcialmente a partir do projeto XML do VeterC:
+// --> xmlveterc_para_cabecalho(xml_veterc, destino);
+// Foram gerados para todas as torres cadastradas no WindSentinel do Yoda: \\yoda\dados_torres\cabecalhos
+
+// Informações da Torre
+nome_caracteristico = "%%nome_caracteristico%%"; //string, Ex.: Wilson do Banco, Santa Clara I, etc.
+municipio = "%%municipio%%"; // string
+uf = "%%uf%%"; // string
+altitude_torre = %%altitude_torre%%; // número
+//------------graus decimais---------------
+%%dec%%lat_d = %%lat_dec%%; // número, latitude em graus decimais
+%%dec%%lon_d = %%lon_dec%%;// número, longitude em graus decimais
+//----OU graus, minutos, segundos----------
+%%gms%%lat_gms = [%%sn%% %%grau_lat_gms%% %%min_lat_gms%% %%seg_lat_gms%%]; // número, latitude em [graus minutos segundos]
+%%gms%%lon_gms = [%%lo%% %%grau_lon_gms%% %%min_lon_gms%% %%seg_lon_gms%%]; // número, longitude em [graus minutos segundos]
+%%gms%%[lat_d, lon_d] = gms2dec(lat_gms, lon_gms);
+dec_mag = declmag(lat_d, lon_d);
+data_instalacao = "%%data_instalacao%%";// string no formato dd/MM/yyyy V
+fabricante = "%%fabric%%";// string V
+tipo_estrutura = "%%tipo_estrutura%%";// string, Ex.: Treliçada de seção triangular V
+material = "%%material%%";// string Ex.: Aço galvanizado V
+altura_torre = %%altura_torre%%; // número V
+diametro_trelica = %%diametro_trelica%%; // número V
+diametro_montantes = %%diametro_montantes%%; // número V
+tipo_montantes = "%%tipo_montantes%%";// string, Ex.: Tubular V
+altura_face = %%altura_face%%;// numero V
+largura_face = %%largura_face%%; // número V
+intervalo_estais = %%intervalo_estais%%; // número (metros)
+angulos_estais = [%%angulo1%%,%%angulo2%%,%%angulo3%%]; // número V
+comprimento_bracos = %%comprimento_bracos%%; // número V
+diametro_bracos = %%diametro_bracos%%; // número V
+distancia_anemo_haste = %%distancia_anemo_haste%%; // número V
+// ---- Exemplos de configuração dos sensores. 
+// !!!Todos os campos são strings, inclusive slope e offset!!!
+// Ajuda: help(dados_torre)
+
+//-----------------------------INSTRUMENTOS-----------------------------
+// Formato:
+//   instrumentos = [["Tipo1", "Slope1", "Offset1", "Serial1", "Fabricante1", "Modelo1"];
+//                   ["Tipo2", "Slope2", "Offset2", "Serial2", "Fabricante2", "Modelo2"]];
+// Coluna "TipoX" pode ser: "Anemometro", "Vane", "Barometro", "Higrometro" e "Termometro"
+
+
+instrumentos = [
+%%instrumentos%%
+];
+
+//-----------------------------CONFIGURACAO-----------------------------
+// Matriz com a distribuição dos instrumentos pelos canais do(s) datalogger(s)
+// Formato:
+//   configuracao = [["instrumentos_1", "serial datalogger", "canal datalogger", "posicao1", "altura1", "inicio operação1", "fim operação1"];
+//                   ["instrumentos_2", "serial datalogger", "canal datalogger", "posicao2", "altura2", "inicio operação2", "fim operação2"]];
+// Obs.:
+//   Coluna "instrumentos_X": contém a referência para a matriz instrumentos acima, 
+//                            onde o X é o nº da linha do instrumento na matriz instrumentos
+//   Coluna "serial do datalogger": 
+//       NRG: serial pode ser obtido processando-se um .RWD no programa Symphonie Data Retriever. (CH1, CH2....)
+//       SecondWind: pode ser obtido processando-se um .NDF no programa Nomad2 Desktop. (C1, C2, C3, A1, A2 A3...)
+//       Ammonit Meteo40: pode ser obtido no rodapé dos arquivos .CSV. 
+//       Ammonit Meteo32: aparece na última coluna do cabeçalho dos arquivos BRUTOS .ROW
+//       Kintech: - Obtido carregando-se um arquivo .sit no programa EOL Manager ou
+//                - Na última coluna da linha #2 de um arquivo .WND ou
+//                - Nos arquivos .TXT gerados na decodificação dos .WND, 
+//                  que geralmente ficam juntos e com o mesmo nome dos .WND
+//   Coluna "canal do datalogger": 
+//       NRG: O nome do canal pode ser obtido processando um pacote no programa Symphonie Data Retriever. 
+//       SecondWind: O nome do canal pode ser obtido processando um pacote no programa Nomad2 Desktop.
+//       Ammonit Meteo40: O nome do canal pode ser obtido no rodapé dos arquivos .CSV
+//       Ammonit Meteo32: O nome do canal é o número da coluna no arquivo .ROW
+//       Kintech: - Obtido carregando-se um arquivo .sit no programa EOL Manager, 
+//                - Na linha #3 dos arquivos .WND ou 
+//                - Nos arquivos .TXT gerados na decodificação dos .WND, 
+//                  que geralmente ficam juntos e com o mesmo nome dos .WND
+// Coluna "posicao": ID do instrumento. Exemplo: anemômetro de topo = 1, anemômetro intermediário = 2, anemômetro inferior = 3, windvane superior = 1
+// Coluna "altura": Altura de instalação do instrumento em metros, sem a unidade
+// Coluna "inicio operação": formato dd/MM/aaaa
+// Coluna "fim operação": formato dd/MM/aaaa. Caso continue em operação, colocar string vazia ""
+// Exemplo:
+//   configuracao = [["instrumentos_1","7260408221","WS(1)","1","122","30/07/2015","11/10/2017"];
+//                   ["instrumentos_2","7260408221","WS(1)","1","122","11/10/2017",""];
+//                   ["instrumentos_3","7260408221","WS(2)","2","100","30/07/2015","11/10/2017"];
+//                   ["instrumentos_4","7260408221","WS(2)","2","100","11/10/2017",""];
+//                   ["instrumentos_5","7260408221","WS(3)","3","80","30/07/2015","11/10/2017"];
+//                   ["instrumentos_6","7260408221","WS(3)","3","80","11/10/2017",""];
+//                   ["instrumentos_7","7260408221","WS(4)","4","60","30/07/2015","11/10/2017"];
+//                   ["instrumentos_8","7260408221","WS(4)","4","60","11/10/2017",""];
+//                   ["instrumentos_11","7260408221","ANL(1)","1","12","30/07/2015",""];
+//                   ["instrumentos_12","7260408221","ANL(3)","1","12","30/07/2015",""];
+//                   ["instrumentos_13","7260408221","ANL(2)","1","12","30/07/2015",""];
+//                   ["instrumentos_9","7260408221","WD(1)","1","119","30/07/2015",""];
+//                   ["instrumentos_10","7260408221","WD(2)","2","58","30/07/2015",""]];
+
+
+configuracao = [
+%%configuracao%%
+];
+
+//--------------------------LOGGERS(OPCIONAL)---------------------------
+// Matriz com informações dos loggers instalados (OPCIONAL):
+// <!--Esta matriz é opcional no processamento dos dados, 
+//     utilizada apenas para gerar o relatório final -->
+// Formato:
+//   loggers = [["Fabricante1", "Modelo1", "Serial1", "Altura1", "Inicio operação1", "Fim operação1"];
+
+//              ["Fabricante2", "Modelo2", "Serial2", "Altura2", "Inicio operação2", "Fim operação2"]];
+// Obs.:
+//   Coluna "Inicio operaçãoX": formato dd/MM/aaaa
+//   Coluna "fim operaçãoX": formato dd/MM/aaaa. Caso continue em operação, colocar string vazia ""
+// Exemplo:
+//   loggers = [["Kintech","EOL Zenith","7260408221","12","30/07/2015",""]];
+
+loggers = [
+
+%%loggers%%
+  
+];
+//---------------CONFIGURACAO DOS LOGGERS(KINTECH E METEO32)------------
+pins = []; // Linha deve existir
+config_logger = struct(); // Linha deve existir
+//config = struct();
+//config("WS(1)") = [0.04775 0.284];
+//config("WS(2)") = [0.04799 0.241];
+//config("WS(3)") = [0.04777 0.264];
+//config("WD(1)") = [1 0];
+//config("WD(2)") = [1 0];
+//config("ANL(1)") = [1 0];
+//config_logger("5685204458").data("23/08/2011") = config;
+
+//-------------------------CERTIFICADOS(OPCIONAL)-----------------------
+// Matriz com as informações dos certificados de calibração dos anemômetros (OPCIONAL):
+// Utilize o nome do instituto de acordo com o nome do arquivo na pasta "auster/bin": WindGuard, PUC-RS, OTECH, etc
+// <!-- Esta matriz é opcional no processamento dos dados, 
+//      utilizada apenas para gerar o relatório final -->
+// Formato:
+//   certificados = [["instrumentos_1","Nome da certificadora1", "Data do certificado1", "Código do certificado1"];
+//                   ["instrumentos_2","Nome da certificadora2", "Data do certificado2", "Código do certificado2"]];
+// Obs.:
+//   Coluna #1 "instrumentos_X":  contém a referência para a matriz instrumentos acima, 
+//                                onde o X é o nº da linha do instrumento na matriz instrumentos
+// Exemplo:
+//   certificados = [["instrumentos_3","IDR","13/03/2015","21523AC"];
+//                   ["instrumentos_2","WindGuard","14/09/2016","1614787"];
+//                   ["instrumentos_1","IDR","13/03/2015","21522AC"];
+//                   ["instrumentos_4","WindGuard","14/09/2016","1614788"];
+//                   ["instrumentos_5","IDR","13/03/2015","21521AC"];
+//                   ["instrumentos_6","WindGuard","14/09/2016","1614789"];
+//                   ["instrumentos_7","IDR","12/03/2015","21520AC"];
+//                   ["instrumentos_8","WindGuard","14/09/2016","1614790"]];
+certificados = [//TODO: Rever lista
+//                ["instrumentos_1","Otech","12/02/2008","ND"];
+//                ["instrumentos_2","Otech","12/02/2008","ND"];
+//                ["instrumentos_7","WindGuard","21/06/2009","09/3599"];
+//                ["instrumentos_6","WindGuard","26/01/2011","10505"];
+//                ["instrumentos_5","WindGuard","21/06/2009","09/3602"];
+                ];
+
+CD = colunas_padrao(instrumentos, configuracao);

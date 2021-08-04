@@ -133,17 +133,14 @@ periodo.fim.dia = CALENDARIO(string(periodo.fim.mes)).dias;
 
 
 elaborador_nome = "%%elaborador_nome%%"; // string
-//elaborador_nome = "Guilherme Guebur Lima"; // string
 
 elaborador_formacao = "%%elaborador_formacao%%"; // string
-//elaborador_formacao = "Engenheiro de Controle e Automação"; // string
 
 elaborador_crea = "%%elaborador_crea%%"; // string
-//elaborador_crea = "PR-105028/D"; // string
 
-//revisor_nome = "Fabiano de Jesus Lima da Silva"; // string
-//revisor_formacao = "Engenheiro Aeronáutico"; // string
-//revisor_crea = "PR-30100/D"; // string
+//revisor_nome = ""; // string
+//revisor_formacao = ""; // string
+//revisor_crea = ""; // string
 
 // Base de longo prazo
 base_lp = "ERA5"; //"MERRA", "NCAR", "VORTEX", etc (ver comum.sci);

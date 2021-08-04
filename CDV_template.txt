@@ -108,8 +108,8 @@ diro = dir_cert + "\dados_processados";
 // Cria o período total para carregar os dados
 
 
-periodo = criaperiodo(%%periodo_total%%); // Múltiplo de 12 mesmo que não tenha dados no final
-//periodo_total = criaperiodo(07,2013,06,2016); // Múltiplo de 12 mesmo que não tenha dados no final
+periodo_total = criaperiodo(%%periodo_total%%); // Múltiplo de 12 mesmo que não tenha dados no final
+
 periodo_total.ini.dia = 1;
 periodo_total.fim.dia = CALENDARIO(string(periodo_total.fim.mes)).dias;
 

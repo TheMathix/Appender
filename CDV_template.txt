@@ -109,6 +109,7 @@ diro = dir_cert + "\dados_processados";
 
 
 periodo = criaperiodo(%%periodo_total%%); // Múltiplo de 12 mesmo que não tenha dados no final
+//periodo_total = criaperiodo(07,2013,06,2016); // Múltiplo de 12 mesmo que não tenha dados no final
 periodo_total.ini.dia = 1;
 periodo_total.fim.dia = CALENDARIO(string(periodo_total.fim.mes)).dias;
 
@@ -132,8 +133,13 @@ periodo.fim.dia = CALENDARIO(string(periodo.fim.mes)).dias;
 
 
 elaborador_nome = "%%elaborador_nome%%"; // string
+//elaborador_nome = "Guilherme Guebur Lima"; // string
+
 elaborador_formacao = "%%elaborador_formacao%%"; // string
+//elaborador_formacao = "Engenheiro de Controle e Automação"; // string
+
 elaborador_crea = "%%elaborador_crea%%"; // string
+//elaborador_crea = "PR-105028/D"; // string
 
 //revisor_nome = "Fabiano de Jesus Lima da Silva"; // string
 //revisor_formacao = "Engenheiro Aeronáutico"; // string

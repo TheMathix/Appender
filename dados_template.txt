@@ -12,8 +12,8 @@ altitude_torre = %%altitude_torre%%; // número
 %%dec%%lat_d = %%lat_dec%%; // número, latitude em graus decimais
 %%dec%%lon_d = %%lon_dec%%;// número, longitude em graus decimais
 //----OU graus, minutos, segundos----------
-%%gms%%lat_gms = [%%sn%% %%grau_lat_gms%% %%min_lat_gms%% %%seg_lat_gms%%]; // número, latitude em [graus minutos segundos]
-%%gms%%lon_gms = [%%lo%% %%grau_lon_gms%% %%min_lon_gms%% %%seg_lon_gms%%]; // número, longitude em [graus minutos segundos]
+%%gms%%lat_gms = [%%sn%%%%grau_lat_gms%% %%min_lat_gms%% %%seg_lat_gms%%]; // número, latitude em [graus minutos segundos]
+%%gms%%lon_gms = [%%lo%%%%grau_lon_gms%% %%min_lon_gms%% %%seg_lon_gms%%]; // número, longitude em [graus minutos segundos]
 %%gms%%[lat_d, lon_d] = gms2dec(lat_gms, lon_gms);
 dec_mag = declmag(lat_d, lon_d);
 data_instalacao = "%%data_instalacao%%";// string no formato dd/MM/yyyy V
@@ -42,8 +42,8 @@ distancia_anemo_haste = %%distancia_anemo_haste%%; // número V
 // Coluna "TipoX" pode ser: "Anemometro", "Vane", "Barometro", "Higrometro" e "Termometro"
 
 
-instrumentos = [
-%%instrumentos%%
+instrumentos = [//TODO: Fazer lista
+	%%instrumentos%%
 ];
 
 //-----------------------------CONFIGURACAO-----------------------------
@@ -92,8 +92,8 @@ instrumentos = [
 //                   ["instrumentos_10","7260408221","WD(2)","2","58","30/07/2015",""]];
 
 
-configuracao = [
-%%configuracao%%
+configuracao = [//TODO: Refazer lista
+	%%configuracao%%
 ];
 
 //--------------------------LOGGERS(OPCIONAL)---------------------------
@@ -110,11 +110,10 @@ configuracao = [
 // Exemplo:
 //   loggers = [["Kintech","EOL Zenith","7260408221","12","30/07/2015",""]];
 
-loggers = [
-
-%%loggers%%
-  
+loggers = [//TODO:Rever e VER FORMATO DO SERIAL
+	%%loggers%%
 ];
+
 //---------------CONFIGURACAO DOS LOGGERS(KINTECH E METEO32)------------
 pins = []; // Linha deve existir
 config_logger = struct(); // Linha deve existir

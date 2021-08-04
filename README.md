@@ -17,3 +17,16 @@ criados na pasta do programa.
 
 -Este programa tem fé no bom senso das informações inseridas e não é à prova de idiotas, portanto use com parcimônia e certifique-se
 que os dados inseridos estão corretos.
+
+
+----------------------------------------------------------------------------------------------------------------------
+
+-Para os campos de data de início e término de operação, ao preencher apenas números as barras são inseridas automaticamente.
+Ex: para inserir 14/12/1998, você pode escrever apenas 14121998 para poupar tempo e o programa irá inserir as barras.
+
+-É possível editar os instrumentos e dataloggers após serem inseridos nas tabelas nas páginas "Instrumentos" e "Dataloggers".
+
+-Inserir ponto ou vírgula nos campos númericos não faz diferença, vírgula será convertido em ponto.
+
+-Não colocar sinal + ou - nas coordenadas GMS, atente que há um campo para inserir S (sul) ou N (norte) e L (leste) ou O (oeste)
+

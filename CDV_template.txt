@@ -146,7 +146,7 @@ elaborador_crea = "%%elaborador_crea%%"; // string
 base_lp = "ERA5"; //"MERRA", "NCAR", "VORTEX", etc (ver comum.sci);
 texto_lp = " - ECMWF Re-Analysis, 5th Generation"; //"GMAO Modern-Era Retrospective-analysis for Research and Applications"
 pnt_lp  = CDV_LP_PROX;   // Pode-se usar a tag do ponto ou opções CDV_LP_PROX ou CDV_LP_CORR
-periodo_lp = criaperiodo(07,2013,06,2016);
+periodo_lp = criaperiodo(%%periodo_total%%);
 
 // Fim do período comum de longo_prazo
 lpf.ano = 2021;

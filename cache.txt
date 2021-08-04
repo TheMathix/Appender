@@ -1,5 +1,5 @@
 nome_elab:Guilherme Guebur Lima
 form_elab:Engenheiro de Controle e Automação
-crea_elab:PR-105028/D
-cliente:Casa dos Ventos
-fabricante:Hatec
+crea_elab:
+cliente:
+fabricante:
